@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29613.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Brighty", "Brighty\Brighty.csproj", "{73C9BFEA-CD9C-4239-8F8E-E2FE41E5814C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{73C9BFEA-CD9C-4239-8F8E-E2FE41E5814C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{73C9BFEA-CD9C-4239-8F8E-E2FE41E5814C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{73C9BFEA-CD9C-4239-8F8E-E2FE41E5814C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{73C9BFEA-CD9C-4239-8F8E-E2FE41E5814C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B798FE0B-4537-4FBA-A931-6079E66260DB}
+	EndGlobalSection
+EndGlobal
