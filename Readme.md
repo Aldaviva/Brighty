@@ -4,7 +4,7 @@
 This is a plugin for [Launchy](https://www.launchy.net/) that lets you change the brightness of your computer screen.
 
 ## Installation
-1. [Install .NET Framework 4.5.2 or later](https://dotnet.microsoft.com/download/dotnet-framework).
+1. [Install .NET Framework 4.8 or later](https://dotnet.microsoft.com/download/dotnet-framework).
 1. [Install Launchy](https://www.launchy.net/download.php#windows).
 1. Download [Launchy# 1.3 or later](https://github.com/randrey/launchysharp/releases) (not the source code files).
     1. Extract the ZIP file into your Launchy installation directory.
@@ -28,5 +28,5 @@ This is a plugin for [Launchy](https://www.launchy.net/) that lets you change th
 
 ## Building
 - Visual Studio 2019 Community
-- .NET Framework 4.5.2 Targeting Pack
-- The `Launchy#API.dll` reference comes from [randrey/launchysharp](https://github.com/randrey/launchysharp), which should be installed in the Launchy `plugins` directory. You will need to adjust the path of this reference depending on your Launchy installation directory.
+- .NET Framework 4.8 Targeting Pack
+- The `Launchy#API.dll` reference comes from [randrey/launchysharp](https://github.com/randrey/launchysharp), and it should be installed in the Launchy `plugins` directory. You will need to adjust the path of this reference depending on your Launchy installation directory.

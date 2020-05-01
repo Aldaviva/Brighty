@@ -2,7 +2,6 @@
 
 using System;
 using System.Linq;
-using System.Runtime.Remoting.Messaging;
 using System.Threading.Tasks;
 using SharpLib.MonitorConfig;
 
@@ -20,10 +19,6 @@ namespace Brighty {
 
         public MonitorServiceImpl() {
             Task.Run(() => monitors); //eagerly scan monitors in the background when initializing
-        }
-
-        public void Dispose() {
-            _monitors?.Dispose();
         }
 
         public uint brightness {
@@ -49,13 +44,17 @@ namespace Brighty {
         private Monitors monitors {
             get {
                 _monitors ??= new Monitors();
-                
+
                 if (_monitors.VirtualMonitors.Sum(monitor => monitor.PhysicalMonitors.Count) == 0) {
                     _monitors.Scan(); //takes a second to run
                 }
 
                 return _monitors;
             }
+        }
+
+        public void Dispose() {
+            _monitors?.Dispose();
         }
 
     }

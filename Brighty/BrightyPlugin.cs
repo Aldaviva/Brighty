@@ -14,12 +14,12 @@ namespace Brighty {
 
         private IPluginHost? pluginHost;
         private ICatItemFactory? catalogItemFactory;
-        private string pluginPath;
+        private string? pluginPath;
 
-        public void init(IPluginHost pluginHost) {
-            if (pluginHost != null) {
-                this.pluginHost = pluginHost;
-                catalogItemFactory = pluginHost.catItemFactory();
+        public void init(IPluginHost _pluginHost) {
+            if (_pluginHost != null) {
+                pluginHost = _pluginHost;
+                catalogItemFactory = _pluginHost.catItemFactory();
             }
         }
 
@@ -94,8 +94,8 @@ namespace Brighty {
 
         public void launchyHide() { }
 
-        public void setPath(string pluginPath) {
-            this.pluginPath = pluginPath;
+        public void setPath(string _pluginPath) {
+            pluginPath = _pluginPath;
         }
 
         public void Dispose() {
