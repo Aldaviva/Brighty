@@ -14,6 +14,7 @@ namespace Brighty {
 
         private IPluginHost? pluginHost;
         private ICatItemFactory? catalogItemFactory;
+        private string pluginPath;
 
         public void init(IPluginHost pluginHost) {
             if (pluginHost != null) {
@@ -32,8 +33,8 @@ namespace Brighty {
 
         public void getLabels(List<IInputData> inputDataList) {
             if (inputDataList.Count == 2) {
-                string inputText = inputDataList[0].getText();
-                if (inputText.Equals("brightness", StringComparison.CurrentCultureIgnoreCase)) {
+                string commandText = inputDataList[0].getText();
+                if (commandText.Equals("brightness", StringComparison.CurrentCultureIgnoreCase)) {
                     inputDataList[0].setLabel(getID());
                 }
             }
@@ -47,22 +48,33 @@ namespace Brighty {
 
         public void getResults(List<IInputData> inputDataList, List<ICatItem> resultsList) {
             if (catalogItemFactory != null && inputDataList[0].hasLabel(getID())) {
-                string inputText = inputDataList[1].getText();
-                if (!string.IsNullOrEmpty(inputText)) {
-                    resultsList.Add(catalogItemFactory.createCatItem(inputText, inputText + "%", getID(), getIcon()));
+                string argumentText = inputDataList[1].getText();
+
+                string fullPath;
+                string shortName;
+                if (string.IsNullOrEmpty(argumentText)) {
+                    //show current brightness when first tabbing into "Brightness", don't allow changing brightness yet
+                    fullPath = string.Empty;
+                    shortName = monitorService.brightness + "%";
+                } else {
+                    //specify new brightness by typing a number after tabbing into "Brightness"
+                    fullPath = argumentText;
+                    shortName = argumentText + "%";
                 }
+
+                resultsList.Add(catalogItemFactory.createCatItem(fullPath, shortName, getID(), getIcon()));
             }
         }
 
         private string getIcon() {
-            return Path.Combine(pluginHost?.launchyPaths().getIconsPath(), "Brighty.ico");
+            return Path.Combine(pluginPath, "icons", "Brighty.ico");
         }
 
         public void launchItem(List<IInputData> inputDataList, ICatItem item) {
             ICatItem catalogItem = inputDataList[inputDataList.Count - 1].getTopResult();
             try {
                 uint desiredBrightness = Convert.ToUInt32(catalogItem.getFullPath());
-                Task.Run(() => monitorService.setBrightness(desiredBrightness));
+                Task.Run(() => monitorService.brightness = desiredBrightness);
             } catch (FormatException) {
                 // ignore non-integer inputs, like if the user just runs "Brightness" instead of "Brightness 50"
             }
@@ -82,7 +94,9 @@ namespace Brighty {
 
         public void launchyHide() { }
 
-        public void setPath(string pluginPath) { }
+        public void setPath(string pluginPath) {
+            this.pluginPath = pluginPath;
+        }
 
         public void Dispose() {
             monitorService.Dispose();

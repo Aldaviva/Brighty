@@ -1,6 +1,8 @@
 ﻿#nullable enable
 
 using System;
+using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using System.Threading.Tasks;
 using SharpLib.MonitorConfig;
 
@@ -8,7 +10,7 @@ namespace Brighty {
 
     public interface MonitorService: IDisposable {
 
-        void setBrightness(uint brightness);
+        uint brightness { get; set; }
 
     }
 
@@ -24,20 +26,31 @@ namespace Brighty {
             _monitors?.Dispose();
         }
 
-        public void setBrightness(uint brightness) {
-            monitors.VirtualMonitors.ForEach(virtualMonitor => {
-                virtualMonitor.PhysicalMonitors.ForEach(monitor => {
-                    if (monitor.SupportsBrightness) {
-                        monitor.Brightness = monitor.Brightness.withCurrent(brightness);
-                    }
+        public uint brightness {
+            get {
+                return monitors.VirtualMonitors
+                    .Find(monitor => monitor.IsPrimary())
+                    .PhysicalMonitors
+                    .First(monitor => monitor.SupportsBrightness)
+                    .Brightness
+                    .Current;
+            }
+            set {
+                monitors.VirtualMonitors.ForEach(virtualMonitor => {
+                    virtualMonitor.PhysicalMonitors.ForEach(monitor => {
+                        if (monitor.SupportsBrightness) {
+                            monitor.Brightness = monitor.Brightness.withCurrent(value);
+                        }
+                    });
                 });
-            });
+            }
         }
 
         private Monitors monitors {
             get {
-                if (_monitors == null) {
-                    _monitors = new Monitors();
+                _monitors ??= new Monitors();
+                
+                if (_monitors.VirtualMonitors.Sum(monitor => monitor.PhysicalMonitors.Count) == 0) {
                     _monitors.Scan(); //takes a second to run
                 }
 
