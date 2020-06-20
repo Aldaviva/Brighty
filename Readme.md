@@ -5,6 +5,7 @@ This is a plugin for [Launchy](https://www.launchy.net/) that lets you change th
 
 ## Installation
 1. [Install .NET Framework 4.8 or later](https://dotnet.microsoft.com/download/dotnet-framework).
+1. [Install .NET Framework 2.0/3.0/3.5](https://docs.microsoft.com/en-us/dotnet/framework/install/dotnet-35-windows-10#enable-the-net-framework-35-in-control-panel), which is required by Launchy# and is not installed by default in Windows 8 or later.
 1. [Install Launchy](https://www.launchy.net/download.php#windows).
 1. Download [Launchy# 1.3 or later](https://github.com/randrey/launchysharp/releases) (not the source code files).
     1. Extract the ZIP file into your Launchy installation directory.
@@ -24,7 +25,7 @@ This is a plugin for [Launchy](https://www.launchy.net/) that lets you change th
 ## Notes
 - Your monitor must support DDC/CI to be able to control it from your computer.
 - This plugin uses the [Windows Monitor Configuration](https://docs.microsoft.com/en-us/windows/win32/monitor/monitor-configuration?redirectedfrom=MSDN) API, exposed through [SharpLib.MonitorConfig](https://github.com/Slion/SharpLibMonitorConfig).
-- If you have multiple monitors connected to your computer, this plugin will change the brightness on all of them at once. It doesn't support setting the brightness of individual monitors, nor can it maintain a custom relationship between the brightness of multiple monitors (for example, if your left monitor is dimmer than your right monitor, and its brightness always needs to be set 5% higher in order for them to match each other). In this case, you should probably just fork this repository and put your custom logic in `MonitorServiceImpl.setBrightness(uint)`.
+- If you have multiple monitors connected to your computer, this plugin will change the brightness on all of them at once. It doesn't support setting the brightness of individual monitors, nor can it maintain a custom relationship between the brightness of multiple monitors (for example, if your left monitor is dimmer than your right monitor, and its brightness always needs to be set 5% higher in order for them to match each other). In this case, you should probably just fork this repository and put your custom logic in `MonitorServiceImpl.set_brightness(uint)`.
 
 ## Building
 - Visual Studio 2019 Community
