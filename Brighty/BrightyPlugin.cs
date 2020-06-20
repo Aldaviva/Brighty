@@ -3,12 +3,15 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using LaunchySharp;
 
 namespace Brighty {
 
     public class BrightyPlugin: IPlugin, IDisposable {
+
+        private const string COMMAND_TEXT = "Brightness";
 
         private readonly MonitorService monitorService = new MonitorServiceImpl();
 
@@ -34,7 +37,7 @@ namespace Brighty {
         public void getLabels(List<IInputData> inputDataList) {
             if (inputDataList.Count == 2) {
                 string commandText = inputDataList[0].getText();
-                if (commandText.Equals("brightness", StringComparison.CurrentCultureIgnoreCase)) {
+                if (commandText.Equals(COMMAND_TEXT, StringComparison.CurrentCultureIgnoreCase)) {
                     inputDataList[0].setLabel(getID());
                 }
             }
@@ -42,7 +45,7 @@ namespace Brighty {
 
         public void getCatalog(List<ICatItem> catalogItems) {
             if (catalogItemFactory != null) {
-                catalogItems.Add(catalogItemFactory.createCatItem("SetBrightness.brighty", "Brightness", getID(), getIcon()));
+                catalogItems.Add(catalogItemFactory.createCatItem("SetBrightness.brighty", COMMAND_TEXT, getID(), getIcon()));
             }
         }
 
@@ -71,7 +74,7 @@ namespace Brighty {
         }
 
         public void launchItem(List<IInputData> inputDataList, ICatItem item) {
-            ICatItem catalogItem = inputDataList[inputDataList.Count - 1].getTopResult();
+            ICatItem catalogItem = inputDataList.Last().getTopResult();
             try {
                 uint desiredBrightness = Convert.ToUInt32(catalogItem.getFullPath());
                 Task.Run(() => monitorService.brightness = desiredBrightness);

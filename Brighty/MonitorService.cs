@@ -2,6 +2,7 @@
 
 using System;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using SharpLib.MonitorConfig;
 
@@ -31,10 +32,19 @@ namespace Brighty {
                     .Current;
             }
             set {
+                value = Math.Min(Math.Max(0, value), 100);
                 monitors.VirtualMonitors.ForEach(virtualMonitor => {
                     virtualMonitor.PhysicalMonitors.ForEach(monitor => {
                         if (monitor.SupportsBrightness) {
+                            SetLastError(0);
+
                             monitor.Brightness = monitor.Brightness.withCurrent(value);
+
+                            int newError = Marshal.GetLastWin32Error();
+                            if (newError != 0) {
+                                monitors.Scan();
+                                brightness = value;
+                            }
                         }
                     });
                 });
@@ -56,6 +66,9 @@ namespace Brighty {
         public void Dispose() {
             _monitors?.Dispose();
         }
+
+        [DllImport("kernel32.dll")]
+        private static extern void SetLastError(uint errorCode);
 
     }
 
