@@ -7,11 +7,13 @@ This is a program for Windows 10 that lets you change the brightness of your com
 1. [Install .NET Framework 4.8 or later](https://dotnet.microsoft.com/download/dotnet-framework).
 1. Go to the [Releases](https://github.com/Aldaviva/Brighty/releases) page for this repository.
 1. Under the Assets for the latest release, download the ZIP file (not the Source Code ZIP).
+1. Extract the contents of the ZIP file to a directory on your hard drive.
 
 ## Usage
-1. Run the program.
+1. Run the `Brightness.exe` program you extracted earlier.
 1. Type in a percentage for the desired brightness of the screen, as an integer between `0` and `100`.
 1. Press `Enter`, and your monitor's brightness should change.
+1. Press `Esc` to close the program, or enter a new percentage to change it again.
 
 ## Notes
 - Your monitor must support DDC/CI to be able to control it from your computer.
