@@ -1,0 +1,33 @@
+﻿<Window x:Class="BrightyUI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:BrightyUI"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="57" Width="274" ResizeMode="NoResize" ShowInTaskbar="False" WindowStartupLocation="CenterScreen"
+        WindowStyle="None" Deactivated="Window_Deactivated" KeyUp="MainWindow_OnKeyUp" AllowsTransparency="True"
+        Background="Transparent">
+    <Window.Resources>
+        <local:PercentageValueConverter x:Key="percentageValueConverter" />
+    </Window.Resources>
+
+    <Border Background="#CC000000" CornerRadius="3">
+        <Grid Margin="11,7,11,7">
+            <Label Content="&#xe706;" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="#FFAA00"
+                   FontFamily="Segoe MDL2 Assets" FontSize="34px" />
+
+            <TextBox x:Name="brightnessInput" Foreground="White" FontFamily="Serifa Std" FontWeight="Bold" FontSize="17"
+                     Margin="49,2,0,0" VerticalAlignment="Top" TextWrapping="NoWrap"
+                     Text="{Binding Path=percentage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource percentageValueConverter}, ValidatesOnExceptions=True, RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}}"
+                     Background="Transparent" BorderThickness="0" CaretBrush="White" MaxLines="1" SelectionBrush="#80FFFFFF">
+                <Validation.ErrorTemplate>
+                    <x:Null />
+                </Validation.ErrorTemplate>
+            </TextBox>
+
+            <Label Content="Brightness" HorizontalAlignment="Left" Margin="47,19,0,0" VerticalAlignment="Top"
+                   FontFamily="Serifa Std 45 Light" Foreground="#40FFFFFF" FontSize="12" />
+        </Grid>
+    </Border>
+</Window>
