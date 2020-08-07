@@ -5,29 +5,39 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BrightyUI"
         mc:Ignorable="d"
-        Title="MainWindow" Height="57" Width="274" ResizeMode="NoResize" ShowInTaskbar="False" WindowStartupLocation="CenterScreen"
-        WindowStyle="None" Deactivated="Window_Deactivated" KeyUp="MainWindow_OnKeyUp" AllowsTransparency="True"
-        Background="Transparent">
+        Title="MainWindow" Height="57" Width="274" ResizeMode="NoResize" ShowInTaskbar="False" WindowStartupLocation="CenterScreen" WindowStyle="None" Deactivated="OnDeactivated"
+        KeyUp="OnKeyUp" AllowsTransparency="True" Background="Transparent" Topmost="True"
+        DataContext="{Binding RelativeSource={RelativeSource Self}}"
+        d:DataContext="{d:DesignInstance local:MainWindow, IsDesignTimeCreatable=False}">
     <Window.Resources>
         <local:PercentageValueConverter x:Key="percentageValueConverter" />
     </Window.Resources>
 
-    <Border Background="#CC000000" CornerRadius="3">
+    <Border Background="#D8000000" CornerRadius="3">
         <Grid Margin="11,7,11,7">
-            <Label Content="&#xe706;" HorizontalAlignment="Left" VerticalAlignment="Top" Foreground="#FFAA00"
-                   FontFamily="Segoe MDL2 Assets" FontSize="34px" />
+            <Label Content="&#xe706;" HorizontalAlignment="Left" VerticalAlignment="Top" FontFamily="Segoe MDL2 Assets" FontSize="34px">
+                <Label.Style>
+                    <Style TargetType="Label">
+                        <!-- setting default gray Foreground directly on Label element will override all DataTriggers, so declare it in a style instead -->
+                        <Setter Property="Foreground" Value="#808080" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding isInitialized.Value}" Value="True">
+                                <Setter Property="Foreground" Value="#FFAA00" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Label.Style>
+            </Label>
 
-            <TextBox x:Name="brightnessInput" Foreground="White" FontFamily="Serifa Std" FontWeight="Bold" FontSize="17"
-                     Margin="49,2,0,0" VerticalAlignment="Top" TextWrapping="NoWrap"
-                     Text="{Binding Path=percentage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource percentageValueConverter}, ValidatesOnExceptions=True, RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}}"
+            <TextBox x:Name="brightnessInput" Foreground="White" FontFamily="Serifa Std" FontWeight="Bold" FontSize="17" Margin="49,2,0,0" VerticalAlignment="Top" TextWrapping="NoWrap"
+                     Text="{Binding Path=percentage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource percentageValueConverter}, ValidatesOnExceptions=True}"
                      Background="Transparent" BorderThickness="0" CaretBrush="White" MaxLines="1" SelectionBrush="#80FFFFFF">
                 <Validation.ErrorTemplate>
                     <x:Null />
                 </Validation.ErrorTemplate>
             </TextBox>
 
-            <Label Content="Brightness" HorizontalAlignment="Left" Margin="47,19,0,0" VerticalAlignment="Top"
-                   FontFamily="Serifa Std 45 Light" Foreground="#40FFFFFF" FontSize="12" />
+            <Label Content="Brightness" HorizontalAlignment="Left" Margin="47,19,0,0" VerticalAlignment="Top" FontFamily="Serifa Std 45 Light" Foreground="#40FFFFFF" FontSize="12" />
         </Grid>
     </Border>
 </Window>

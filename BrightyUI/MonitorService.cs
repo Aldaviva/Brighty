@@ -3,6 +3,7 @@
 using System;
 using System.Linq;
 using System.Runtime.InteropServices;
+using KoKo.Property;
 using SharpLib.MonitorConfig;
 
 namespace BrightyUI {
@@ -11,20 +12,31 @@ namespace BrightyUI {
 
         uint brightness { get; set; }
 
+        Property<bool> isInitialized { get; }
+
     }
 
     public class MonitorServiceImpl: MonitorService {
 
         private Monitors? _monitors;
 
+        private readonly object scanLock = new object();
+
+        private readonly StoredProperty<bool> _isInitialized = new StoredProperty<bool>();
+        public Property<bool> isInitialized { get; }
+
+        public MonitorServiceImpl() {
+            isInitialized = _isInitialized;
+        }
+
         public uint brightness {
             get {
                 return monitors.VirtualMonitors
-                    .Find(monitor => monitor.IsPrimary())
-                    .PhysicalMonitors
-                    .First(monitor => monitor.SupportsBrightness)
-                    .Brightness
-                    .Current;
+                               .Find(monitor => monitor.IsPrimary())
+                               .PhysicalMonitors
+                               .First(monitor => monitor.SupportsBrightness)
+                               .Brightness
+                               .Current;
             }
             set {
                 value = Math.Min(Math.Max(0, value), 100);
@@ -48,13 +60,17 @@ namespace BrightyUI {
 
         private Monitors monitors {
             get {
-                _monitors ??= new Monitors();
+                lock (scanLock) {
+                    _monitors ??= new Monitors();
 
-                if (_monitors.VirtualMonitors.Sum(monitor => monitor.PhysicalMonitors.Count) == 0) {
-                    _monitors.Scan(); //takes a second to run
+                    if (_monitors.VirtualMonitors.Sum(monitor => monitor.PhysicalMonitors.Count) == 0) {
+                        _isInitialized.Value = false;
+                        _monitors.Scan(); //takes a second to run
+                        _isInitialized.Value = true;
+                    }
+
+                    return _monitors;
                 }
-
-                return _monitors;
             }
         }
 
