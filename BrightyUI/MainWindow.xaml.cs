@@ -28,7 +28,9 @@ namespace BrightyUI {
             registryKey = Registry.LocalMachine.CreateSubKey(@"Software\Brighty", true);
             percentage  = Convert.ToUInt32(registryKey.GetValue(MRU_REGISTRY_NAME, 100));
 
-            isInitialized = new SynchronizationContextProperty<bool>(monitorService.isInitialized, SynchronizationContext.Current);
+            isInitialized = new PassthroughProperty<bool>(monitorService.isInitialized) {
+                EventSynchronizationContext = SynchronizationContext.Current
+            };
 
             InitializeComponent();
 
@@ -48,16 +50,16 @@ namespace BrightyUI {
             // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault not trying to handle every single key
             switch (e.Key) {
                 case Key.Escape:
-                    e.Handled = true;
                     isClosing = true;
                     Close();
+                    e.Handled = true;
                     break;
 
                 case Key.Enter:
                     if (!Validation.GetHasError(brightnessInput)) {
-                        e.Handled                 = true;
                         monitorService.brightness = percentage;
                         registryKey.SetValue(MRU_REGISTRY_NAME, percentage, RegistryValueKind.DWord);
+                        e.Handled = true;
                     }
 
                     break;
