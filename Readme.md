@@ -17,8 +17,8 @@ This is a program for Windows 10 that lets you change the brightness of your com
 
 ## Notes
 - Your monitor must support DDC/CI to be able to control it from your computer.
-- This program uses the [Windows Monitor Configuration](https://docs.microsoft.com/en-us/windows/win32/monitor/monitor-configuration?redirectedfrom=MSDN) API, exposed through [SharpLib.MonitorConfig](https://github.com/Slion/SharpLibMonitorConfig).
-- If you have multiple monitors connected to your computer, this program will change the brightness on all of them at once. It doesn't support setting the brightness of individual monitors, nor can it maintain a custom relationship between the brightness of multiple monitors (for example, if your left monitor is dimmer than your right monitor, and its brightness always needs to be set 5% higher in order for them to match each other). In this case, you should probably just fork this repository and put your custom logic in `MonitorServiceImpl.set_brightness(uint)`.
+- This program uses the [Windows Monitor Configuration](https://docs.microsoft.com/en-us/windows/win32/monitor/monitor-configuration?redirectedfrom=MSDN) API.
+- If you have multiple monitors connected to your computer, this program will change the brightness on all of them at once. It doesn't support setting the brightness of individual monitors, nor can it maintain a custom relationship between the brightness of multiple monitors (for example, if your left monitor is dimmer than your right monitor, and its brightness always needs to be set 5% higher in order for them to match each other). In this case, you should probably just fork this repository and put your custom logic in `DirectXVideoAccelerationMonitorService.set_brightness(uint)`.
 - This program should run fine on Windows 7 as well, but the icon in the UI currently comes from the Segoe MDL2 Assets font that is only available in Windows 10, so the icon will look wrong in Windows 7.
 
 ## Building

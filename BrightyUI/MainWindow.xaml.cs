@@ -1,15 +1,12 @@
 ﻿#nullable enable
 
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Animation;
 using BrightyUI.Services;
-using KoKo.Property;
 using Microsoft.Win32;
 
 namespace BrightyUI {
@@ -19,7 +16,6 @@ namespace BrightyUI {
         private const string MRU_REGISTRY_NAME = "mostRecentBrightnessPercentage";
 
         public uint percentage { get; set; }
-        public Property<bool> isInitialized { get; }
 
         private readonly MonitorService monitorService = new DirectXVideoAccelerationMonitorService();
         private readonly RegistryKey registryKey;
@@ -30,14 +26,10 @@ namespace BrightyUI {
             registryKey = Registry.LocalMachine.CreateSubKey(@"Software\Brighty", true);
             percentage = Convert.ToUInt32(registryKey.GetValue(MRU_REGISTRY_NAME, 0));
 
-            isInitialized = new PassthroughProperty<bool>(monitorService.isInitialized) {
-                EventSynchronizationContext = SynchronizationContext.Current
-            };
-
             InitializeComponent();
 
             Task.Run(() => {
-                //this library takes a while to initialize, so start it early in the background
+                //this library takes about 52 ms initialize, so let the window appear before it's done and start it early in the background
                 uint _ = monitorService.brightness;
             });
         }
@@ -76,13 +68,10 @@ namespace BrightyUI {
             }
         }
 
-        private Task setBrightness() {
-            //async to avoid deadlock with MonitorService setting isInitialized=true and trying to update the UI
-            return Task.Run(() => {
-                monitorService.brightness = percentage;
-                registryKey.SetValue(MRU_REGISTRY_NAME, percentage, RegistryValueKind.DWord);
-            });
-        }
+        private Task setBrightness() => Task.Run(() => {
+            monitorService.brightness = percentage;
+            registryKey.SetValue(MRU_REGISTRY_NAME, percentage, RegistryValueKind.DWord);
+        });
 
         private void OnDeactivated(object sender, EventArgs e) {
             if (!isClosing) {

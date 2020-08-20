@@ -16,26 +16,7 @@
 
     <Border Background="#D8000000" CornerRadius="3">
         <Grid Margin="11,7,11,7">
-            <Label Content="&#xe706;" HorizontalAlignment="Left" VerticalAlignment="Top" FontFamily="Segoe MDL2 Assets" FontSize="34px">
-                <Label.Style>
-                    <Style TargetType="Label">
-                        <!-- setting default gray Foreground directly on Label element will override all DataTriggers, so declare it in a style instead -->
-                        <Setter Property="Foreground" Value="#808080" />
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding isInitialized.Value}" Value="True">
-                                <DataTrigger.EnterActions>
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <ColorAnimation To="#FFAA00" Duration="00:00:00.225" Storyboard.TargetProperty="Foreground.Color" />
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </DataTrigger.EnterActions>
-                                <!--     <Setter Property="Foreground" Value="#FFAA00" /> -->
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Label.Style>
-            </Label>
+            <Label Content="&#xe706;" HorizontalAlignment="Left" VerticalAlignment="Top" FontFamily="Segoe MDL2 Assets" FontSize="34px" Foreground="#FFAA00" />
 
             <TextBox x:Name="brightnessInput" Foreground="White" FontFamily="Serifa Std" FontWeight="Bold" FontSize="17" Margin="49,2,0,0" VerticalAlignment="Top" TextWrapping="NoWrap"
                      Text="{Binding Path=percentage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource percentageValueConverter}, ValidatesOnExceptions=True}"

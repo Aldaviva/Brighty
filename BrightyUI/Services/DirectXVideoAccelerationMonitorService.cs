@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
-using KoKo.Property;
 
 #nullable enable
 
@@ -9,28 +7,49 @@ namespace BrightyUI.Services {
 
     public class DirectXVideoAccelerationMonitorService: MonitorService {
 
-        private PhysicalMonitor[]? _monitors;
-
         private readonly object scanLock = new object();
-
-        public Property<bool> isInitialized { get; }
-        private readonly StoredProperty<bool> _isInitialized = new StoredProperty<bool>();
 
         private uint currentBrightness;
 
-        public DirectXVideoAccelerationMonitorService() {
-            isInitialized = _isInitialized;
+        private IDisposable foo;
+
+        private PhysicalMonitor[]? _monitors;
+
+        private PhysicalMonitor[] monitors {
+            get {
+                lock (scanLock) {
+                    if (_monitors == null) {
+                        initialize();
+                    }
+                }
+
+                return _monitors!;
+            }
+        }
+
+        public void initialize() {
+            IntPtr monitor = MonitorFromPoint(new Point(0, 0), MonitorOptions.MONITOR_DEFAULTTOPRIMARY);
+
+            if (!GetNumberOfPhysicalMonitorsFromHMONITOR(monitor, out uint monitorCount)) {
+                throw new ApplicationException($"Could not get number of physical monitors from monitor {monitor}.");
+            }
+
+            _monitors = new PhysicalMonitor[monitorCount];
+            GetPhysicalMonitorsFromHMONITOR(monitor, monitorCount, monitors);
+
+            uint minBrightness = 0;
+            uint maxBrightness = 0;
+            GetMonitorBrightness(monitors[0].handle, ref minBrightness, ref currentBrightness, ref maxBrightness); //return brightness from first monitor, which may not be the primary
         }
 
         public uint brightness {
             get {
-                PhysicalMonitor[] _ = monitors; //scan if not already scanned
+                PhysicalMonitor[] _ = monitors; //ensure initialized
                 return currentBrightness;
             }
             set {
                 value = Math.Min(Math.Max(0, value), 100);
 
-                // scale values according to the first monitor's brightness range, which may not be the same for all monitors
                 foreach (PhysicalMonitor physicalMonitor in monitors) {
                     SetMonitorBrightness(physicalMonitor.handle, value);
                 }
@@ -39,53 +58,26 @@ namespace BrightyUI.Services {
             }
         }
 
-        private PhysicalMonitor[] monitors {
-            get {
-                lock (scanLock) {
-                    if (_monitors == null) {
-                        _isInitialized.Value = false;
-                        scan();
-                        _isInitialized.Value = true;
-                    }
-
-                    return _monitors!;
-                }
-            }
-        }
-
-        private void scan() {
-            var stopwatch = Stopwatch.StartNew();
-            IntPtr monitor = MonitorFromPoint(new Point(0, 0), MonitorOptions.MONITOR_DEFAULTTOPRIMARY);
-            if (!GetNumberOfPhysicalMonitorsFromHMONITOR(monitor, out uint monitorCount)) {
-                throw new ApplicationException($"Could not get number of physical monitors from monitor {monitor}.");
-            }
-
-            _monitors = new PhysicalMonitor[monitorCount];
-            GetPhysicalMonitorsFromHMONITOR(monitor, monitorCount, _monitors);
-
-            uint minBrightness = 0;
-            uint maxBrightness = 0;
-            GetMonitorBrightness(monitors[0].handle, ref minBrightness, ref currentBrightness, ref maxBrightness); //return brightness from first monitor, which may not be the primary
-
-            stopwatch.Stop();
-            Trace.WriteLine($"Monitors scanned in {stopwatch.ElapsedMilliseconds:N0} ms.");
-
-            _isInitialized.Value = true;
-        }
-
         private void releaseUnmanagedResources() {
             if (_monitors?.Length > 0) {
                 DestroyPhysicalMonitors((uint) monitors.Length, ref _monitors);
             }
         }
 
-        ~DirectXVideoAccelerationMonitorService() {
+        private void dispose(bool disposing) {
             releaseUnmanagedResources();
+            if (disposing) {
+                _monitors = null;
+            }
         }
 
         public void Dispose() {
-            releaseUnmanagedResources();
+            dispose(true);
             GC.SuppressFinalize(this);
+        }
+
+        ~DirectXVideoAccelerationMonitorService() {
+            dispose(false);
         }
 
         #region external
@@ -114,15 +106,15 @@ namespace BrightyUI.Services {
             public IntPtr handle;
 
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 128)]
-            public string description;
+            public readonly string description;
 
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        public struct Point {
+        public readonly struct Point {
 
-            public int x;
-            public int y;
+            public readonly int x;
+            public readonly int y;
 
             public Point(int x, int y) {
                 this.x = x;
@@ -131,14 +123,16 @@ namespace BrightyUI.Services {
 
         }
 
-        public enum MonitorOptions : uint
-        {
+        public enum MonitorOptions: uint {
+
             MONITOR_DEFAULTTONULL = 0x00000000,
             MONITOR_DEFAULTTOPRIMARY = 0x00000001,
             MONITOR_DEFAULTTONEAREST = 0x00000002
+
         }
 
         #endregion
+
     }
 
 }
