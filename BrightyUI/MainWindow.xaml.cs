@@ -8,6 +8,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using BrightyUI.Services;
 using KoKo.Property;
 using Microsoft.Win32;
 
@@ -20,7 +21,7 @@ namespace BrightyUI {
         public uint percentage { get; set; }
         public Property<bool> isInitialized { get; }
 
-        private readonly MonitorService monitorService = new MonitorServiceImpl();
+        private readonly MonitorService monitorService = new DirectXVideoAccelerationMonitorService();
         private readonly RegistryKey registryKey;
 
         private bool isClosing;

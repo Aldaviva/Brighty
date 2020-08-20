@@ -1,23 +1,15 @@
-﻿#nullable enable
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using KoKo.Property;
 using SharpLib.MonitorConfig;
 
-namespace BrightyUI {
+#nullable enable
 
-    public interface MonitorService: IDisposable {
+namespace BrightyUI.Services {
 
-        uint brightness { get; set; }
-
-        Property<bool> isInitialized { get; }
-
-    }
-
-    public class MonitorServiceImpl: MonitorService {
+    public class SharpLibMonitorConfigMonitorServiceImpl: MonitorService {
 
         private Monitors? _monitors;
 
@@ -26,18 +18,18 @@ namespace BrightyUI {
         private readonly StoredProperty<bool> _isInitialized = new StoredProperty<bool>();
         public Property<bool> isInitialized { get; }
 
-        public MonitorServiceImpl() {
+        public SharpLibMonitorConfigMonitorServiceImpl() {
             isInitialized = _isInitialized;
         }
 
         public uint brightness {
             get {
                 return monitors.VirtualMonitors
-                               .Find(monitor => monitor.IsPrimary())
-                               .PhysicalMonitors
-                               .First(monitor => monitor.SupportsBrightness)
-                               .Brightness
-                               .Current;
+                    .Find(monitor => monitor.IsPrimary())
+                    .PhysicalMonitors
+                    .First(monitor => monitor.SupportsBrightness)
+                    .Brightness
+                    .Current;
             }
             set {
                 value = Math.Min(Math.Max(0, value), 100);

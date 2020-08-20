@@ -86,6 +86,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Services\DirectXVideoAccelerationMonitorService.cs" />
+    <Compile Include="Services\SharpLibMonitorConfigMonitorService.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -101,7 +103,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MonitorConfigExtensions.cs" />
-    <Compile Include="MonitorService.cs" />
+    <Compile Include="Services\MonitorService.cs" />
     <Compile Include="PercentageValueConverter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
@@ -136,5 +138,6 @@
   <ItemGroup>
     <Resource Include="brighty.ico" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
