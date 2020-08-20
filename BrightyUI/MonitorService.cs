@@ -1,6 +1,7 @@
 ﻿#nullable enable
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using KoKo.Property;
@@ -40,21 +41,22 @@ namespace BrightyUI {
             }
             set {
                 value = Math.Min(Math.Max(0, value), 100);
-                monitors.VirtualMonitors.ForEach(virtualMonitor => {
-                    virtualMonitor.PhysicalMonitors.ForEach(monitor => {
-                        if (monitor.SupportsBrightness) {
-                            SetLastError(0);
 
-                            monitor.Brightness = monitor.Brightness.withCurrent(value);
+                IEnumerable<PhysicalMonitor> monitorsToSet = monitors.VirtualMonitors
+                    .SelectMany(monitor => monitor.PhysicalMonitors)
+                    .Where(monitor => monitor.SupportsBrightness);
 
-                            int newError = Marshal.GetLastWin32Error();
-                            if (newError != 0) {
-                                monitors.Scan();
-                                brightness = value;
-                            }
-                        }
-                    });
-                });
+                foreach (PhysicalMonitor monitor in monitorsToSet) {
+                    SetLastError(0);
+
+                    monitor.Brightness = monitor.Brightness.withCurrent(value);
+
+                    int error = Marshal.GetLastWin32Error();
+                    if (error != 0) {
+                        monitors.Scan();
+                        brightness = value;
+                    }
+                }
             }
         }
 

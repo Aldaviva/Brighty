@@ -6,7 +6,7 @@ This is a program for Windows 10 that lets you change the brightness of your com
 ## Installation
 1. [Install .NET Framework 4.8 or later](https://dotnet.microsoft.com/download/dotnet-framework).
 1. Go to the [Releases](https://github.com/Aldaviva/Brighty/releases) page for this repository.
-1. Under the Assets for the latest release, download the ZIP file (not the Source Code ZIP).
+1. Under the Assets for the latest release, download the `Brighty.zip` file (not the Source Code ZIP).
 1. Extract the contents of the ZIP file to a directory on your hard drive.
 
 ## Usage

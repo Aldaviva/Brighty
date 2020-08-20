@@ -27,7 +27,7 @@ namespace BrightyUI {
 
         public MainWindow() {
             registryKey = Registry.LocalMachine.CreateSubKey(@"Software\Brighty", true);
-            percentage = Convert.ToUInt32(registryKey.GetValue(MRU_REGISTRY_NAME, 100));
+            percentage = Convert.ToUInt32(registryKey.GetValue(MRU_REGISTRY_NAME, 0));
 
             isInitialized = new PassthroughProperty<bool>(monitorService.isInitialized) {
                 EventSynchronizationContext = SynchronizationContext.Current
@@ -43,40 +43,55 @@ namespace BrightyUI {
 
         protected override void OnSourceInitialized(EventArgs e) {
             base.OnSourceInitialized(e);
-            Top -= 2; // line up with Launchy
+
+            // line up with Launchy
+            Top -= 2;
+
+            // really become the foreground window, even if mstsc was right behind Launchy
+            Activate();
+            Focus();
+
             brightnessInput.Focus();
             brightnessInput.Select(0, brightnessInput.Text.Length - "%".Length);
         }
 
-        private void OnKeyUp(object sender, KeyEventArgs e) {
+        private void OnKeyDown(object sender, KeyEventArgs e) {
+            e.Handled = true;
+
             // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault not trying to handle every single key
             switch (e.Key) {
                 case Key.Escape when !isClosing:
-                    isClosing = true;
+                case Key.System when e.SystemKey == Key.F4: // Alt+F4
                     fadeOutAndClose();
-                    e.Handled = true;
                     break;
 
                 case Key.Enter when !Validation.GetHasError(brightnessInput):
-                    Task.Run(() => monitorService.brightness = percentage); //async to avoid deadlock with MonitorService setting isInitialized=true and trying to update the UI
-                    registryKey.SetValue(MRU_REGISTRY_NAME, percentage, RegistryValueKind.DWord);
-                    e.Handled = true;
+                    setBrightness();
                     break;
 
                 default:
+                    e.Handled = false;
                     break;
             }
         }
 
+        private Task setBrightness() {
+            //async to avoid deadlock with MonitorService setting isInitialized=true and trying to update the UI
+            return Task.Run(() => {
+                monitorService.brightness = percentage;
+                registryKey.SetValue(MRU_REGISTRY_NAME, percentage, RegistryValueKind.DWord);
+            });
+        }
+
         private void OnDeactivated(object sender, EventArgs e) {
             if (!isClosing) {
-                isClosing = true;
                 fadeOutAndClose();
             }
         }
 
         private void fadeOutAndClose() {
-            var fadeOutAnimation = new DoubleAnimation(1, 0, new Duration(TimeSpan.FromMilliseconds(175)));
+            isClosing = true;
+            var fadeOutAnimation = new DoubleAnimation(0, new Duration(TimeSpan.FromMilliseconds(175)));
             fadeOutAnimation.Completed += delegate { Close(); };
             BeginAnimation(OpacityProperty, fadeOutAnimation);
         }
