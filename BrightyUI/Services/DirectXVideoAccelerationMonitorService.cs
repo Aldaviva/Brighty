@@ -11,10 +11,7 @@ namespace BrightyUI.Services {
 
         private uint currentBrightness;
 
-        private IDisposable foo;
-
         private PhysicalMonitor[]? _monitors;
-
         private PhysicalMonitor[] monitors {
             get {
                 lock (scanLock) {

@@ -1,6 +1,7 @@
 ﻿#nullable enable
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -38,11 +39,11 @@ namespace BrightyUI {
             base.OnSourceInitialized(e);
 
             // line up with Launchy
-            Top -= 2;
+            Top -= 3;
+            Left -= 1;
 
             // really become the foreground window, even if mstsc was right behind Launchy
-            Activate();
-            Focus();
+            this.globalActivate();
 
             brightnessInput.Focus();
             brightnessInput.Select(0, brightnessInput.Text.Length - "%".Length);
