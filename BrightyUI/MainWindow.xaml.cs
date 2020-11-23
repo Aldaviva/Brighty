@@ -1,7 +1,6 @@
 ﻿#nullable enable
 
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -19,13 +18,13 @@ namespace BrightyUI {
         public uint percentage { get; set; }
 
         private readonly MonitorService monitorService = new DirectXVideoAccelerationMonitorService();
-        private readonly RegistryKey registryKey;
+        private readonly RegistryKey    registryKey;
 
         private bool isClosing;
 
         public MainWindow() {
             registryKey = Registry.LocalMachine.CreateSubKey(@"Software\Brighty", true);
-            percentage = Convert.ToUInt32(registryKey.GetValue(MRU_REGISTRY_NAME, 0));
+            percentage  = Convert.ToUInt32(registryKey.GetValue(MRU_REGISTRY_NAME, 0));
 
             InitializeComponent();
 
@@ -39,22 +38,25 @@ namespace BrightyUI {
             base.OnSourceInitialized(e);
 
             // line up with Launchy
-            Top -= 3;
+            Top  -= 3;
             Left -= 1;
 
             // really become the foreground window, even if mstsc was right behind Launchy
             this.globalActivate();
 
             brightnessInput.Focus();
-            brightnessInput.Select(0, brightnessInput.Text.Length - "%".Length);
+            selectNumericBrightnessText();
         }
 
         private void OnKeyDown(object sender, KeyEventArgs e) {
             e.Handled = true;
+            bool isCtrlDown = Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl);
 
             // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault not trying to handle every single key
             switch (e.Key) {
                 case Key.Escape when !isClosing:
+                case Key.F4 when isCtrlDown:
+                case Key.W when isCtrlDown:
                 case Key.System when e.SystemKey == Key.F4: // Alt+F4
                     fadeOutAndClose();
                     break;
@@ -69,15 +71,20 @@ namespace BrightyUI {
             }
         }
 
-        private Task setBrightness() => Task.Run(() => {
+        private void setBrightness() {
             monitorService.brightness = percentage;
+            selectNumericBrightnessText();
             registryKey.SetValue(MRU_REGISTRY_NAME, percentage, RegistryValueKind.DWord);
-        });
+        }
 
         private void OnDeactivated(object sender, EventArgs e) {
             if (!isClosing) {
                 fadeOutAndClose();
             }
+        }
+
+        private void selectNumericBrightnessText() {
+            brightnessInput.Select(0, brightnessInput.Text.Length - "%".Length);
         }
 
         private void fadeOutAndClose() {
