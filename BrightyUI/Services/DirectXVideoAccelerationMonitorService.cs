@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Windows;
 
 #nullable enable
 
@@ -7,11 +8,17 @@ namespace BrightyUI.Services {
 
     public class DirectXVideoAccelerationMonitorService: MonitorService {
 
-        private readonly object scanLock = new object();
+        private const uint DEFAULT_MINIMUM_BRIGHTNESS = 0;
+        private const uint DEFAULT_MAXIMUM_BRIGHTNESS = 100;
+
+        private readonly object scanLock = new();
 
         private uint currentBrightness;
+        private uint minimumBrightness;
+        private uint maximumBrightness;
 
         private PhysicalMonitor[]? _monitors;
+
         private PhysicalMonitor[] monitors {
             get {
                 lock (scanLock) {
@@ -24,19 +31,20 @@ namespace BrightyUI.Services {
             }
         }
 
-        public void initialize() {
-            IntPtr monitor = MonitorFromPoint(new Point(0, 0), MonitorOptions.MONITOR_DEFAULTTOPRIMARY);
+        private void initialize() {
+            IntPtr hmonitor = MonitorFromPoint(new Point(0, 0), MonitorOptions.MONITOR_DEFAULTTOPRIMARY);
 
-            if (!GetNumberOfPhysicalMonitorsFromHMONITOR(monitor, out uint monitorCount)) {
-                throw new ApplicationException($"Could not get number of physical monitors from monitor {monitor}.");
-            }
+            GetNumberOfPhysicalMonitorsFromHMONITOR(hmonitor, out uint monitorCount);
 
             _monitors = new PhysicalMonitor[monitorCount];
-            GetPhysicalMonitorsFromHMONITOR(monitor, monitorCount, monitors);
+            GetPhysicalMonitorsFromHMONITOR(hmonitor, monitorCount, _monitors);
 
-            uint minBrightness = 0;
-            uint maxBrightness = 0;
-            GetMonitorBrightness(monitors[0].handle, ref minBrightness, ref currentBrightness, ref maxBrightness); //return brightness from first monitor, which may not be the primary
+            //return brightness from first monitor, which may not be the primary, or the same for all monitors
+            GetMonitorBrightness(monitors[0].handle, ref minimumBrightness, ref currentBrightness, ref maximumBrightness);
+
+            if (minimumBrightness != DEFAULT_MINIMUM_BRIGHTNESS || maximumBrightness != DEFAULT_MAXIMUM_BRIGHTNESS) {
+                currentBrightness = (uint) ((double) (currentBrightness - minimumBrightness) / (maximumBrightness - minimumBrightness));
+            }
         }
 
         public uint brightness {
@@ -45,7 +53,11 @@ namespace BrightyUI.Services {
                 return currentBrightness;
             }
             set {
-                value = Math.Min(Math.Max(0, value), 100);
+                value = Math.Min(Math.Max(DEFAULT_MINIMUM_BRIGHTNESS, value), DEFAULT_MAXIMUM_BRIGHTNESS); // 0 <= value <= 100
+
+                if (minimumBrightness != DEFAULT_MINIMUM_BRIGHTNESS || maximumBrightness != DEFAULT_MAXIMUM_BRIGHTNESS) {
+                    value = (uint) ((double) value * (maximumBrightness - minimumBrightness) + minimumBrightness);
+                }
 
                 foreach (PhysicalMonitor physicalMonitor in monitors) {
                     SetMonitorBrightness(physicalMonitor.handle, value);
@@ -57,7 +69,7 @@ namespace BrightyUI.Services {
 
         private void releaseUnmanagedResources() {
             if (_monitors?.Length > 0) {
-                DestroyPhysicalMonitors((uint) monitors.Length, ref _monitors);
+                DestroyPhysicalMonitors((uint) _monitors.Length, ref _monitors);
             }
         }
 
@@ -83,35 +95,35 @@ namespace BrightyUI.Services {
         private static extern bool GetPhysicalMonitorsFromHMONITOR(IntPtr monitor, uint physicalMonitorCount, [Out] PhysicalMonitor[] physicalMonitors);
 
         [DllImport("user32.dll", SetLastError = true)]
-        public static extern IntPtr MonitorFromPoint(Point point, MonitorOptions flags);
+        private static extern IntPtr MonitorFromPoint(Point point, MonitorOptions flags);
 
         [DllImport("dxva2.dll")]
         private static extern bool GetNumberOfPhysicalMonitorsFromHMONITOR(IntPtr monitor, out uint physicalMonitorCount);
 
         [DllImport("dxva2.dll")]
-        public static extern bool DestroyPhysicalMonitors(uint physicalMonitorCount, ref PhysicalMonitor[] physicalMonitors);
+        private static extern bool DestroyPhysicalMonitors(uint physicalMonitorCount, ref PhysicalMonitor[] physicalMonitors);
 
         [DllImport("dxva2.dll")]
-        public static extern bool GetMonitorBrightness(IntPtr physicalMonitorHandle, ref uint minimumBrightness, ref uint currentBrightness, ref uint maxBrightness);
+        private static extern bool GetMonitorBrightness(IntPtr physicalMonitorHandle, ref uint minimumBrightness, ref uint currentBrightness, ref uint maximumBrightness);
 
         [DllImport("dxva2.dll")]
-        public static extern bool SetMonitorBrightness(IntPtr physicalMonitorHandle, uint newBrightness);
+        private static extern bool SetMonitorBrightness(IntPtr physicalMonitorHandle, uint newBrightness);
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
-        public struct PhysicalMonitor {
+        private readonly struct PhysicalMonitor {
 
-            public IntPtr handle;
+            public readonly IntPtr handle;
 
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 128)]
-            public readonly string description;
+            private readonly string description;
 
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        public readonly struct Point {
+        private readonly struct Point {
 
-            public readonly int x;
-            public readonly int y;
+            private readonly int x;
+            private readonly int y;
 
             public Point(int x, int y) {
                 this.x = x;
@@ -120,11 +132,11 @@ namespace BrightyUI.Services {
 
         }
 
-        public enum MonitorOptions: uint {
+        private enum MonitorOptions: uint {
 
-            MONITOR_DEFAULTTONULL = 0x00000000,
-            MONITOR_DEFAULTTOPRIMARY = 0x00000001,
-            MONITOR_DEFAULTTONEAREST = 0x00000002
+            MONITOR_DEFAULTTONULL    = 0x0,
+            MONITOR_DEFAULTTOPRIMARY = 0x1,
+            MONITOR_DEFAULTTONEAREST = 0x2
 
         }
 

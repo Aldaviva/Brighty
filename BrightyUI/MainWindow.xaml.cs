@@ -29,7 +29,7 @@ namespace BrightyUI {
             InitializeComponent();
 
             Task.Run(() => {
-                //this library takes about 52 ms initialize, so let the window appear before it's done and start it early in the background
+                //this library takes about 52 ms to initialize, so let the window appear before it's done and start it early in the background
                 uint _ = monitorService.brightness;
             });
         }
@@ -37,9 +37,11 @@ namespace BrightyUI {
         protected override void OnSourceInitialized(EventArgs e) {
             base.OnSourceInitialized(e);
 
-            // line up with Launchy
-            Top  -= 3;
+            Rect workArea = SystemParameters.WorkArea;
             Left -= 1;
+
+            // In WPF, Window.WindowStartupLocation = CenterScreen rounds up, but we want to round down to be consistent with Launchy's window positioning calculations.
+            Top = Math.Floor((workArea.Height - Height) / 2 + workArea.Top);
 
             // really become the foreground window, even if mstsc was right behind Launchy
             this.globalActivate();

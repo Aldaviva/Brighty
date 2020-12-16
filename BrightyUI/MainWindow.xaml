@@ -5,28 +5,57 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BrightyUI"
         mc:Ignorable="d"
-        Title="Brighty" Height="57" Width="274" ResizeMode="NoResize" ShowInTaskbar="False" WindowStartupLocation="CenterScreen" WindowStyle="None" Deactivated="OnDeactivated"
-        KeyDown="OnKeyDown" AllowsTransparency="True" Background="Transparent" Topmost="True" Icon="brighty.ico"
+        Title="Brighty"
+        Height="67"
+        Width="274"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="None"
+        Deactivated="OnDeactivated"
+        KeyDown="OnKeyDown"
+        AllowsTransparency="True"
+        Background="Transparent"
+        Topmost="True"
+        Icon="brighty.ico"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         d:DataContext="{d:DesignInstance local:MainWindow, IsDesignTimeCreatable=False}"
         xml:lang="en-US">
+
     <Window.Resources>
         <local:PercentageValueConverter x:Key="percentageValueConverter" />
     </Window.Resources>
 
-    <Border Background="#D8000000" CornerRadius="3">
+    <Border Background="#D8000000" CornerRadius="3" Margin="0,3,0,7">
         <Grid Margin="11,7,11,7">
             <Label Content="&#xe706;" HorizontalAlignment="Left" VerticalAlignment="Top" FontFamily="Segoe MDL2 Assets" FontSize="34px" Foreground="#FFAA00" />
 
-            <TextBox x:Name="brightnessInput" Foreground="White" FontFamily="Serifa Std" FontWeight="Bold" FontSize="17" Margin="49,2,0,0" VerticalAlignment="Top" TextWrapping="NoWrap"
+            <TextBox x:Name="brightnessInput"
+                     Foreground="White"
+                     FontFamily="Serifa Std"
+                     FontWeight="Bold" 
+                     FontSize="17" 
+                     Margin="49,2,0,0" 
+                     VerticalAlignment="Top" 
+                     TextWrapping="NoWrap"
                      Text="{Binding Path=percentage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource percentageValueConverter}, ValidatesOnExceptions=True}"
-                     Background="Transparent" BorderThickness="0" CaretBrush="White" MaxLines="1" SelectionBrush="#80FFFFFF">
+                     Background="Transparent"
+                     BorderThickness="0"
+                     CaretBrush="White"
+                     MaxLines="1"
+                     SelectionBrush="#80FFFFFF">
                 <Validation.ErrorTemplate>
                     <x:Null />
                 </Validation.ErrorTemplate>
             </TextBox>
 
-            <Label Content="Brightness" HorizontalAlignment="Left" Margin="47,19,0,0" VerticalAlignment="Top" FontFamily="Serifa Std 45 Light" Foreground="#40FFFFFF" FontSize="12" />
+            <Label Content="Brightness" 
+                   HorizontalAlignment="Left" 
+                   Margin="47,19,0,0" 
+                   VerticalAlignment="Top" 
+                   FontFamily="Serifa Std 45 Light" 
+                   Foreground="#40FFFFFF" 
+                   FontSize="12" />
         </Grid>
     </Border>
 </Window>

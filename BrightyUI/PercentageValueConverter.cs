@@ -15,7 +15,7 @@ namespace BrightyUI {
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
             try {
-                return uint.Parse(value?.ToString().Replace(",", "").TrimEnd('%') ?? "0");
+                return (uint) Math.Round(double.Parse(value.ToString().Replace(",", "").TrimEnd('%')));
             } catch (FormatException e) {
                 return new ValidationResult(false, e.Message);
             }
