@@ -1,34 +1,49 @@
 ﻿#nullable enable
 
 using System;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Animation;
+using BrightyUI.Properties;
 using BrightyUI.Services;
 using Microsoft.Win32;
 
 namespace BrightyUI {
 
-    public partial class MainWindow: IDisposable {
+    public partial class MainWindow: IDisposable, INotifyPropertyChanged {
 
         private const string MRU_REGISTRY_NAME = "mostRecentBrightnessPercentage";
 
-        public uint percentage { get; set; }
+        private uint _percentage;
 
-        private readonly MonitorService monitorService = new DirectXVideoAccelerationMonitorService();
+        public uint percentage {
+            get => _percentage;
+            set {
+                if (value == _percentage) return;
+                _percentage = value;
+                onPropertyChanged();
+            }
+        }
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        private readonly MonitorService monitorService = new DxvaMonitorService();
         private readonly RegistryKey    registryKey;
 
-        private bool isClosing;
+        private int isClosing = Convert.ToInt32(false); //int instead of bool because there are no atomic operations on bool
 
         public MainWindow() {
-            registryKey = Registry.LocalMachine.CreateSubKey(@"Software\Brighty", true);
+            registryKey = Registry.CurrentUser.CreateSubKey(@"Software\Ben Hutchison\Brighty", true);
             percentage  = Convert.ToUInt32(registryKey.GetValue(MRU_REGISTRY_NAME, 0));
 
             InitializeComponent();
 
-            Task.Run(() => {
+            _ = Task.Run(() => {
                 //this library takes about 52 ms to initialize, so let the window appear before it's done and start it early in the background
                 uint _ = monitorService.brightness;
             });
@@ -56,9 +71,9 @@ namespace BrightyUI {
 
             // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault not trying to handle every single key
             switch (e.Key) {
-                case Key.Escape when !isClosing:
-                case Key.F4 when isCtrlDown:
-                case Key.W when isCtrlDown:
+                case Key.Escape:                            // Esc
+                case Key.F4 when isCtrlDown:                // Ctrl+F4
+                case Key.W when isCtrlDown:                 // Ctrl+W
                 case Key.System when e.SystemKey == Key.F4: // Alt+F4
                     fadeOutAndClose();
                     break;
@@ -75,14 +90,13 @@ namespace BrightyUI {
 
         private void setBrightness() {
             monitorService.brightness = percentage;
+            percentage                = monitorService.brightness; // in case clipping occurred
             selectNumericBrightnessText();
             registryKey.SetValue(MRU_REGISTRY_NAME, percentage, RegistryValueKind.DWord);
         }
 
         private void OnDeactivated(object sender, EventArgs e) {
-            if (!isClosing) {
-                fadeOutAndClose();
-            }
+            fadeOutAndClose();
         }
 
         private void selectNumericBrightnessText() {
@@ -90,15 +104,22 @@ namespace BrightyUI {
         }
 
         private void fadeOutAndClose() {
-            isClosing = true;
-            var fadeOutAnimation = new DoubleAnimation(0, new Duration(TimeSpan.FromMilliseconds(175)));
-            fadeOutAnimation.Completed += delegate { Close(); };
-            BeginAnimation(OpacityProperty, fadeOutAnimation);
+            bool wasClosing = Convert.ToBoolean(Interlocked.CompareExchange(ref isClosing, 1, 0));
+            if (!wasClosing) {
+                DoubleAnimation? fadeOutAnimation = new(0, new Duration(TimeSpan.FromMilliseconds(175)));
+                fadeOutAnimation.Completed += delegate { Close(); };
+                BeginAnimation(OpacityProperty, fadeOutAnimation);
+            }
         }
 
         public void Dispose() {
             monitorService.Dispose();
             registryKey.Dispose();
+        }
+
+        [NotifyPropertyChangedInvocator]
+        protected virtual void onPropertyChanged([CallerMemberName] string? propertyName = null) {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
     }
