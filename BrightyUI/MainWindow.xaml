@@ -17,7 +17,7 @@
         AllowsTransparency="True"
         Background="Transparent"
         Topmost="True"
-        Icon="brighty.ico"
+        Icon="Resources/brighty.ico"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         d:DataContext="{d:DesignInstance local:MainWindow, IsDesignTimeCreatable=False}"
         xml:lang="en-US">
@@ -32,8 +32,8 @@
 
             <TextBox x:Name="brightnessInput"
                      Foreground="White"
-                     FontFamily="Serifa Std"
-                     FontWeight="Bold" 
+                     FontFamily="./Resources/Fonts/#Serifa Std 65 Bold" 
+                     FontWeight="Bold"
                      FontSize="17" 
                      Margin="49,2,0,0" 
                      VerticalAlignment="Top" 
@@ -53,7 +53,7 @@
                    HorizontalAlignment="Left" 
                    Margin="47,19,0,0" 
                    VerticalAlignment="Top" 
-                   FontFamily="Serifa Std 45 Light" 
+                   FontFamily="./Resources/Fonts/#Serifa Std 45 Light" 
                    Foreground="#40FFFFFF" 
                    FontSize="12" />
         </Grid>

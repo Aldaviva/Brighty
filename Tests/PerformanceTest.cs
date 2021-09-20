@@ -22,9 +22,10 @@ namespace Tests {
 
         [Benchmark]
         public void directXVideoAccelerationGetBrightness() {
-            using var dxva = new DirectXVideoAccelerationMonitorService();
-            uint actual = dxva.brightness;
+            using DxvaMonitorService dxva = new();
+            uint                     _    = dxva.brightness;
         }
+
     }
 
 }

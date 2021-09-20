@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-using System.Windows;
 
 #nullable enable
 
 namespace BrightyUI.Services {
 
-    public class DirectXVideoAccelerationMonitorService: MonitorService {
+    public class DxvaMonitorService: MonitorService {
 
         private const uint DEFAULT_MINIMUM_BRIGHTNESS = 0;
         private const uint DEFAULT_MAXIMUM_BRIGHTNESS = 100;
@@ -42,7 +41,7 @@ namespace BrightyUI.Services {
             //return brightness from first monitor, which may not be the primary, or the same for all monitors
             GetMonitorBrightness(monitors[0].handle, ref minimumBrightness, ref currentBrightness, ref maximumBrightness);
 
-            if (minimumBrightness != DEFAULT_MINIMUM_BRIGHTNESS || maximumBrightness != DEFAULT_MAXIMUM_BRIGHTNESS) {
+            if ((minimumBrightness != DEFAULT_MINIMUM_BRIGHTNESS) || (maximumBrightness != DEFAULT_MAXIMUM_BRIGHTNESS)) {
                 currentBrightness = (uint) ((double) (currentBrightness - minimumBrightness) / (maximumBrightness - minimumBrightness));
             }
         }
@@ -55,7 +54,7 @@ namespace BrightyUI.Services {
             set {
                 value = Math.Min(Math.Max(DEFAULT_MINIMUM_BRIGHTNESS, value), DEFAULT_MAXIMUM_BRIGHTNESS); // 0 <= value <= 100
 
-                if (minimumBrightness != DEFAULT_MINIMUM_BRIGHTNESS || maximumBrightness != DEFAULT_MAXIMUM_BRIGHTNESS) {
+                if ((minimumBrightness != DEFAULT_MINIMUM_BRIGHTNESS) || (maximumBrightness != DEFAULT_MAXIMUM_BRIGHTNESS)) {
                     value = (uint) ((double) value * (maximumBrightness - minimumBrightness) + minimumBrightness);
                 }
 
@@ -85,7 +84,7 @@ namespace BrightyUI.Services {
             GC.SuppressFinalize(this);
         }
 
-        ~DirectXVideoAccelerationMonitorService() {
+        ~DxvaMonitorService() {
             dispose(false);
         }
 

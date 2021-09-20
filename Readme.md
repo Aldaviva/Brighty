@@ -1,17 +1,20 @@
 ☼ Brighty
 =======
 
-This is a program for Windows 10 that lets you change the brightness of your computer screen.
+This is a program for Windows 10 that lets you quickly and easily change the brightness of your computer screen, without navigating through OSD menus or holding buttons for a long time.
+
+<p align="center">
+    <img src="https://i.imgur.com/cOLrkPD.png" alt="Brighty" />
+</p>
 
 ## Installation
-1. [Install .NET Framework 4.8 or later](https://dotnet.microsoft.com/download/dotnet-framework).
-1. Go to the [Releases](https://github.com/Aldaviva/Brighty/releases) page for this repository.
-1. Under the Assets for the latest release, download the `Brighty.zip` file (not the Source Code ZIP).
-1. Extract the contents of the ZIP file to a directory on your hard drive.
+1. Install [.NET Framework 4.8](https://dotnet.microsoft.com/download/dotnet-framework) (included by default in Windows 10 version 1903 and later).
+1. Go to the [latest Release](https://github.com/Aldaviva/Brighty/releases/latest) of this repository.
+1. Under Assets, download the `Brightness.exe` file.
 
 ## Usage
-1. Run the `Brightness.exe` program you extracted earlier.
-1. Type in a percentage for the desired brightness of the screen, as an integer between `0` and `100`.
+1. Run the `Brightness.exe` program you downloaded earlier.
+1. Type in a percentage for the desired brightness of the screen as an integer between `0` and `100` inclusive.
 1. Press `Enter`, and your monitor's brightness should change.
 1. Press `Esc` to close the program, or enter a new percentage to change it again.
 
@@ -22,5 +25,5 @@ This is a program for Windows 10 that lets you change the brightness of your com
 - This program should run fine on Windows 7 as well, but the icon in the UI currently comes from the Segoe MDL2 Assets font that is only available in Windows 10, so the icon will look wrong in Windows 7.
 
 ## Building
-- Visual Studio 2019 Community
+- Visual Studio 2019 Community or later
 - .NET Framework 4.8 Targeting Pack

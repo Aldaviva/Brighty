@@ -24,7 +24,7 @@ namespace Tests {
             this.testOutputHelper = testOutputHelper;
         }
 
-        public static Summary runBenchmarksForClass(Type benchmarkClass, ITestOutputHelper testOutputHelper) {
+        private static Summary runBenchmarksForClass(Type benchmarkClass, ITestOutputHelper testOutputHelper) {
             testOutputHelper.WriteLine("Running benchmarks, please wait...");
             Summary summary = BenchmarkRunner.Run(benchmarkClass);
             testOutputHelper.WriteLine("\nFull benchmark output saved to {0}\n", summary.LogFilePath);
@@ -34,7 +34,7 @@ namespace Tests {
             return summary;
         }
 
-        public static Summary runBenchmarksForClass<T>(ITestOutputHelper testOutputHelper) {
+        private static Summary runBenchmarksForClass<T>(ITestOutputHelper testOutputHelper) {
             return runBenchmarksForClass(typeof(T), testOutputHelper);
         }
 
@@ -55,7 +55,7 @@ namespace Tests {
         /// <param name="summary">The result from <c>BenchmarkRunner.Run()</c>.</param>
         /// <returns>The summary string snippet that would have normally gone to the console logger.</returns>
         public static string getDetailedResultsAndSummary(this Summary summary) {
-            var logger = new StringLogger();
+            StringLogger? logger = new StringLogger();
 
             if (summary.HasCriticalValidationErrors) {
                 foreach (ValidationError validationError in summary.ValidationErrors) {
@@ -104,7 +104,7 @@ namespace Tests {
             public string Id { get; } = nameof(StreamLogger);
             public int Priority { get; } = 0;
 
-            private readonly StringBuilder stringBuilder = new StringBuilder();
+            private readonly StringBuilder stringBuilder = new();
 
             public void Write(LogKind logKind, string text) {
                 stringBuilder.Append(text);
