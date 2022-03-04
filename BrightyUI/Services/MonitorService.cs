@@ -2,12 +2,10 @@
 
 using System;
 
-namespace BrightyUI.Services {
+namespace BrightyUI.Services; 
 
-    public interface MonitorService: IDisposable {
+public interface MonitorService: IDisposable {
 
-        uint brightness { get; set; }
-
-    }
+    uint brightness { get; set; }
 
 }

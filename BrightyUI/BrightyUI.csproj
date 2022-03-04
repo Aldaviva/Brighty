@@ -85,6 +85,7 @@
     </ApplicationDefinition>
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Services\DxvaMonitorService.cs" />
+    <Compile Include="Services\DxvaMonitorServicePinvoke.cs" />
     <Compile Include="SystemWindows.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

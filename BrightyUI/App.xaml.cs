@@ -1,5 +1,3 @@
-﻿namespace BrightyUI
-{
-    public partial class App {
-    }
-}
+﻿namespace BrightyUI; 
+
+public partial class App { }
